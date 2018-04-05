@@ -1,24 +1,20 @@
 /*
   Window Blinds by Viet Nguyen
   Features:
-    - Auto Update firmware with /update or curl -F "image=@Smart-Blinds.ino.nodemcu.bin" esp8266-v.local/update
-    - To open/close use endpoints GET /open and GET /close
+    - Auto Update firmware with /update or curl -F "image=@HelloServerWorking.ino.nodemcu.bin" esp8266-v.local/update
+    - To open/close use endpoints /open /close
       - By default it uses the speed and duration set in the EEPROM
-      - Overridable values: speed, duration, dutyCycle (ex: /open?speed=1&duration=2400)
+      - Overridable values: speed, duration, dutyCycle
     - Configuration
       - Get: GET /config
       - Set: GET /config with the following values in the query string:
-        - speed: Speed at which the motor turns when opening / closing
+        - Speed: Speed at which the motor turns when opening / closing
           - Allowed values: 1 for slow 2 or fast
-        - duration: Duration at which the motor turns when opening / closing
+        - Duration: Duration at which the motor turns when opening / closing
           - Allowed values: 1000 - 9999 (milliseconds)
-    - Version: GET /version
-    - Wifi Info: 
-      - Get: GET /wifi
-      - Set: GET /wifi with the following values in the query string:
-        - ssid: SSID of Wireless Network
-        - password: Password of Wireless Network
-        - hostname: Desired hostname of the ESP8266
+    - Version: /version
+
+  https://github.com/vietquocnguyen/NodeMCU-ESP8266-Servo-Smart-Blinds    
  */
 
 #include <ESP8266WiFi.h>
@@ -31,7 +27,15 @@
 #include <math.h>
 #include <ArduinoJson.h>
 
-String version = "15";
+#define VERSION 17
+#define DEFAULT_WIFI_SSID "My Wifi Nework 5G"
+#define DEFAULT_WIFI_PASSWORD "MyWifiP@ssword"
+#define DEFAULT_HOSTNAME "esp8266-smart-blinds"
+#define DEFAULT_SPEED "1" // 1 or 2
+#define DEFAULT_DURATION "4000" // 4 characters 1000-9999
+#define DEFAULT_LAST_ACTION "0"
+
+
 char host[25];
 char ssid[25];
 char password[25];
@@ -53,9 +57,17 @@ void setup(void){
   Serial.begin(115200);
   EEPROM.begin(512);
 
-  String theSSID = getData(0,25, "My Wifi Nework 5G");
-  String thePassword = getData(26,50, "MyWifiP@assword");
-  String theHostname = getData(61,80, "esp8266-v");
+  if(getData(84,86,"0") == "1"){
+    // Yay I know you
+  } else {
+    // I don't know you
+    clearEEPROM();
+    setData(84, 86, "1"); // Getting to know you
+  }
+
+  String theSSID = getData(0,25, DEFAULT_WIFI_SSID);
+  String thePassword = getData(26,50, DEFAULT_WIFI_PASSWORD);
+  String theHostname = getData(61,80, DEFAULT_HOSTNAME);
 
   Serial.println("Trying " + theSSID + " / " + thePassword + " / " + theHostname);
   
@@ -72,11 +84,11 @@ void setup(void){
     delay(1000);
     tryCount = tryCount + 1;
     Serial.print("Try #" + String(tryCount) + " ");
-    if(tryCount > 60){
-      Serial.println("Giving up, reverting back to Default");
-      setData(0,25, "My Wifi Nework 5G");
-      setData(26,50, "MyWifiP@assword");
-      setData(61,80, "esp8266-v");
+    if(tryCount > 30){
+      Serial.println("Giving up, reverting back to default Wifi settings");
+      setData(0,25, DEFAULT_WIFI_SSID);
+      setData(26,50, DEFAULT_WIFI_PASSWORD);
+      setData(61,80, DEFAULT_HOSTNAME);
       delay(1000);
       WiFi.disconnect();
       ESP.reset();
@@ -96,7 +108,7 @@ void setup(void){
   server.on("/version", [](){
     JsonObject& json = jsonBuffer.createObject();
     Serial.println("version");
-    json["version"] = version;
+    json["version"] = VERSION;
     String output;
     json.prettyPrintTo(output);
     server.send(200, "application/json", output);
@@ -105,7 +117,7 @@ void setup(void){
   server.on("/status", [](){
     JsonObject& json = jsonBuffer.createObject();
     Serial.println("status");
-    json["isOpen"] = getData(81,83,"1") == "1";;
+    json["isOpen"] = getData(81,83,DEFAULT_LAST_ACTION) == "1";;
     String output;
     json.prettyPrintTo(output);
     server.send(200, "application/json", output);
@@ -119,11 +131,7 @@ void setup(void){
     json.prettyPrintTo(output);
     server.send(200, "application/json", output);
 
-    for (int i = 0 ; i < 512 ; i++) {
-      EEPROM.write(i, 0);
-    }
-    EEPROM.commit();
-    delay(500);
+    clearEEPROM();
     WiFi.disconnect();
     ESP.reset();
   });
@@ -150,14 +158,14 @@ void setup(void){
   server.on("/config", [](){
     JsonObject& json = jsonBuffer.createObject();
 
-    int theSpeed = getData(51,55, "2").toInt();
+    int theSpeed = getData(51,55, DEFAULT_SPEED).toInt();
     if(server.hasArg("speed")){
       theSpeed = server.arg("speed").toInt();
       setData(51,55, String(theSpeed));
     }
     json["speed"] = theSpeed;
 
-    int theDuration = getData(56,60, "2500").toInt();
+    int theDuration = getData(56,60, DEFAULT_DURATION).toInt();
     if(server.hasArg("duration")){
       theDuration = server.arg("duration").toInt();
       setData(56,60, String(theDuration));
@@ -174,21 +182,21 @@ void setup(void){
     JsonObject& json = jsonBuffer.createObject();
     bool resetMe = false;
 
-    String aSsid = getData(0,25, "My Wifi Nework 5G");
+    String aSsid = getData(0,25, DEFAULT_WIFI_SSID);
     if(server.hasArg("ssid")){
       aSsid = setData(0,25, server.arg("ssid"));
       resetMe = true;
     }
     json["ssid"] = aSsid;
 
-    String aPassword = getData(26,50, "MyWifiP@assword");
+    String aPassword = getData(26,50, DEFAULT_WIFI_PASSWORD);
     if(server.hasArg("password")){
       aPassword = setData(26,50, server.arg("password"));
       resetMe = true;
     }
     json["password"] = aPassword;
 
-    String aHostname = getData(61,80, "esp8266-v");
+    String aHostname = getData(61,80, DEFAULT_HOSTNAME);
     if(server.hasArg("hostname")){
       aHostname = setData(61,80, server.arg("hostname"));
       resetMe = true;
@@ -242,17 +250,17 @@ void openOrClose(int direction) {
 
   bool toSpin = true;
 
-  String lastAction = getData(81,83,"1");
+  String lastAction = getData(81,83, DEFAULT_LAST_ACTION);
   if(lastAction == String(direction)){
     toSpin = false;
     json["message"] = "did not spin";
   }
 
-  int theSpeed = getData(51,55, "2").toInt();
+  int theSpeed = getData(51,55, DEFAULT_SPEED).toInt();
   if(server.hasArg("speed")){
     theSpeed = server.arg("speed").toInt();
   }
-  int theDuration = getData(56,60, "2500").toInt();
+  int theDuration = getData(56,60, DEFAULT_DURATION).toInt();
   if(server.hasArg("duration")){
     theDuration = server.arg("duration").toInt();
   }
@@ -340,4 +348,12 @@ String setData(int startingIndex, int endingIndex, String settingValue){
 
 void loop(void){
   server.handleClient();
+}
+
+void clearEEPROM(){
+  for (int i = 0 ; i < 512 ; i++) {
+    EEPROM.write(i, 0);
+  }
+  EEPROM.commit();
+  delay(500);
 }
