@@ -1,6 +1,7 @@
 
 # NodeMCU-ESP8266-Servo-Smart-Blinds
 DIY Smart Blinds using NodeMCU V3/ESP8266 and an MG995 Servo. Integration with SmartThings.
+![Example](img/example.jpg)
 
 **NOTE: I HAVE IMPLEMENTED ZERO SECURITY IN THIS CODE. USE AT YOUR OWN RISK**
 
