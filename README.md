@@ -38,13 +38,16 @@ I used this [video](https://www.youtube.com/watch?v=NEo1WsT5T7s) to get started 
 
 For some reason, every time I flash the code while the servo is connected, it won't work. So many sure you disconnect when you upload your code using USB.
 
-1. Servo Pins: Orange is PWM / Red is 3.3v VCC / Brown is Ground
-2. Connect the Servo connector so that the orange pin is at `D4`, red on `3V` and brown on `G`. No jumper cables needed
-3. Now go to `http://esp8266-smart-blinds.local/close` and `http://esp8266-smart-blinds.local/open` to watch the servo spin in two different directions
-4. To view the speed / duration configuration: `http://esp8266-smart-blinds.local/config`
-5. To change the speed / duration configuration: `http://esp8266-smart-blinds.local/config?speed=2&duration=5000`, then go back to `/open` or `/close` to see the changes
-6. To view the wifi configuration: `http://esp8266-smart-blinds.local/wifi`
-7. To change the wifi configuration: `http://esp8266-smart-blinds.local/wifi?ssid=NEW+Wifi&password=blah`. After this, the NodeMCU will reboot and try to connect to the new network. If it can't connect to the new network within 60 seconds, it'll revert back to the defaults defined in the sketch.
+1. Connect the Servo connector so that the:
+	- ![#FF7323](https://placehold.it/15/FF7323/000000?text=+) Orange pin (PWM) is at `D4`
+	- ![#FF0000](https://placehold.it/15/FF0000/000000?text=+) Red (Vcc) pin is at `3V`
+	- ![#753800](https://placehold.it/15/753800/000000?text=+) Brown (Ground) is at `G`
+	- No jumper wires needed
+2. Now go to `http://esp8266-smart-blinds.local/close` and `http://esp8266-smart-blinds.local/open` to watch the servo spin in two different directions
+3. To view the speed / duration configuration: `http://esp8266-smart-blinds.local/config`
+4. To change the speed / duration configuration: `http://esp8266-smart-blinds.local/config?speed=2&duration=5000`, then go back to `/open` or `/close` to see the changes
+5. To view the wifi configuration: `http://esp8266-smart-blinds.local/wifi`
+6. To change the wifi configuration: `http://esp8266-smart-blinds.local/wifi?ssid=NEW+Wifi&password=blah`. After this, the NodeMCU will reboot and try to connect to the new network. If it can't connect to the new network within 60 seconds, it'll revert back to the defaults defined in the sketch.
 
 ## Integration with SmartThings
 
