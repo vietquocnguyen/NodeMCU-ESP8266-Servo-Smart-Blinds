@@ -46,6 +46,10 @@ For some reason, every time I flash the code while the servo is connected, it wo
 6. To view the wifi configuration: `http://esp8266-smart-blinds.local/wifi`
 7. To change the wifi configuration: `http://esp8266-smart-blinds.local/wifi?ssid=NEW+Wifi&password=blah`. After this, the NodeMCU will reboot and try to connect to the new network. If it can't connect to the new network within 60 seconds, it'll revert back to the defaults defined in the sketch.
 
+## Integration with SmartThings
+
+The device handler is in `smart-blinds.groovy`. This [video](https://youtu.be/zNNGy9xhl34?t=13m51s) does a good job showing how to add a device handler. After you add the device handler, you just have to add a `New Device` and set the `serverIP` preference to your NodeMCU's IP Address. You'll understand once you watch the video.
+
 ## 3D Printing the Ball Chain Adapter
 
 My blinds run on a ball chain, so I 3D printed this [adapter](https://www.thingiverse.com/thing:2850794) to attach to the servo motor arm.
