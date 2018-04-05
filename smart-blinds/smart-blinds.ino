@@ -27,12 +27,12 @@
 #include <math.h>
 #include <ArduinoJson.h>
 
-#define VERSION 17
+#define VERSION 18
 #define DEFAULT_WIFI_SSID "My Wifi Nework 5G"
 #define DEFAULT_WIFI_PASSWORD "MyWifiP@ssword"
 #define DEFAULT_HOSTNAME "esp8266-smart-blinds"
-#define DEFAULT_SPEED "1" // 1 or 2
-#define DEFAULT_DURATION "4000" // 4 characters 1000-9999
+#define DEFAULT_SPEED "2" // 1 or 2
+#define DEFAULT_DURATION "3500" // 4 characters 1000-9999
 #define DEFAULT_LAST_ACTION "0"
 
 
