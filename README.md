@@ -31,7 +31,7 @@ I used this [video](https://www.youtube.com/watch?v=NEo1WsT5T7s) to get started 
 4. If you go to `Tools` > `Serial Monitor`, You will see something like this:
 	
 	![Serial Monitor](serial-monitor.png)
-5. From here you can access the website via `http://esp8266-smart-blinds.local/version` (or whatever you se your `DEFAULT_HOSTNAME` to be) or `http://IPHERE/version`
+5. From here you can access the website via `http://esp8266-smart-blinds.local/version` (or whatever you set your `DEFAULT_HOSTNAME` to be) or `http://IPHERE/version`
 6. Now you need to clear your EEPROM by going to `http://esp8266-smart-blinds.local/clear`
 
 ## Connecting the Servo to the NodeMCU
