@@ -27,7 +27,7 @@
 #include <math.h>
 #include <ArduinoJson.h>
 
-#define VERSION 18
+#define VERSION 19
 #define DEFAULT_WIFI_SSID "My Wifi Nework 5G"
 #define DEFAULT_WIFI_PASSWORD "MyWifiP@ssword"
 #define DEFAULT_HOSTNAME "esp8266-smart-blinds"
@@ -42,7 +42,7 @@ char password[25];
 int servoPin = 2;
 int tryCount = 0;
 Servo Servo1;
-DynamicJsonBuffer jsonBuffer;
+
 ESP8266WebServer server(80);
 ESP8266HTTPUpdateServer httpUpdater;
 
@@ -106,6 +106,7 @@ void setup(void){
 
 
   server.on("/version", [](){
+    DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
     Serial.println("version");
     json["version"] = VERSION;
@@ -115,6 +116,7 @@ void setup(void){
   });
 
   server.on("/status", [](){
+    DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
     Serial.println("status");
     json["isOpen"] = getData(81,83,DEFAULT_LAST_ACTION) == "1";;
@@ -124,6 +126,7 @@ void setup(void){
   });
 
   server.on("/clear", [](){
+    DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
     Serial.println("clear");
     json["message"] = "Clearing EEPROM data and resetting";
@@ -137,6 +140,7 @@ void setup(void){
   });
 
   server.on("/reset", [](){
+    DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
     json["message"] = "resetting";
     Serial.println("Resetting");
@@ -156,6 +160,7 @@ void setup(void){
   });
 
   server.on("/config", [](){
+    DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
 
     int theSpeed = getData(51,55, DEFAULT_SPEED).toInt();
@@ -179,6 +184,7 @@ void setup(void){
   });
 
   server.on("/wifi", [](){
+    DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
     bool resetMe = false;
 
@@ -245,7 +251,7 @@ String macToStr(const uint8_t* mac){
 }
 
 void openOrClose(int direction) {
-
+  DynamicJsonBuffer jsonBuffer;
   JsonObject& json = jsonBuffer.createObject();
 
   bool toSpin = true;
